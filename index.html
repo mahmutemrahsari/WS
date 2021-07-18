@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+      <title>WebSocket For Log Server</title>
+         <meta charset="utf-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+      
+      <script type = "text/javascript">
+         function WebSocketTest() {
+            
+            if ("WebSocket" in window) {
+              
+               
+               // Let us open a web socket
+               var ws = new WebSocket("ws://localhost:6001/ws/debug-logs");
+				if(ws.onopen){
+               ws.onopen = function() {
+                  
+                  console.log("Web Socket is connected");
+                  document.getElementById("button").innerText= "Web Socket is connected";
+                 };
+            }else{
+               alert("Connection Failed Check Your Server!");
+            }
+   
+				
+               ws.onmessage = function (evt) { 
+                  var received_msg = JSON.parse(evt.data);
+                  document.getElementById("sse").innerHTML = received_msg.Logs.Level;
+  
+                  var ut=
+                        "<tr>" +"<td>" + received_msg.Logs.Time + 
+                        "</td>" +"<td>" + received_msg.Logs.Category + 
+                        "</td>" +"<td>" + received_msg.Logs.Ip + 
+                        "</td>" +"<td>" + received_msg.Logs.Msg +  
+                        "</td>" +"<td>" + received_msg.Logs.Type + 
+                        "</td>" +"<td>" + received_msg.Logs.Uri + 
+                        "</td>" +"<td>" + received_msg.Logs.RequestId + 
+                        "</td>" +"<td>" + received_msg.Logs.DebugId + 
+                        "</td>" +"<td>" + received_msg.Logs.UserId+"<tr>";
+                        
+                        document.getElementById("ut").innerHTML += ut; 
+               };
+				
+               ws.onclose = function() { 
+                  // websocket is closed.
+                  console.log("Connection is closed...");
+                  document.getElementById("button").innerText= "Connection is closed...";
+               };
+            } else {
+              
+               // The browser doesn't support WebSocket
+               console.log("WebSocket NOT supported by your Browser!");
+            }
+         }
+
+
+      </script>
+		
+   </head>
+   
+   <body>
+
+       
+       <div class="p-5 text-center bg-light">
+         <h1 class="mb-3">WebSocket For Log Server</h1>
+         <h4 class="mb-3">Log Level : <div id = "sse"></div></h4>
+         <a class="btn btn-primary" href="javascript:WebSocketTest()" role="button" id="button">Run WebSocket</a>
+         <div id="consoleLog"></div>
+       </div>
+      
+
+         
+      </div>
+
+      <div class="container">
+         <h2>Live Log Data</h2>
+         <div class="table-responsive">          
+         <table class="table">
+           <thead>
+             <tr>
+               <th>Time</th>
+               <th>Category</th>
+               <th>Ip</th>
+               <th>Message</th>
+               <th>Type</th>
+               <th>Uri</th>
+               <th>RequestId</th>
+               <th>DebugId</th>
+               <th>UserId</th>
+             </tr>
+           </thead>
+           <tbody id="ut">
+           </tbody>
+         </table>
+         </div>
+       </div>
+       
+      
+   </body>
+</html>
